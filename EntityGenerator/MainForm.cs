@@ -382,24 +382,28 @@ namespace EntityGenerator
 	, EPA.[value] AS AttributeValue, EPD.[value] AS DescriptionValue
 	, Case When EPP.[value] IS NULL Then
 			REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(C.[name],'-','_'), '/','_'),'#','Number'),'.','_'),' ','_')
-		Else EPP.[value] End AS PropertyName
+		Else EPP.[value] End AS PropertyName, EPL.[value] AS PropertyLabel
 FROM sys.columns C
 LEFT JOIN sys.extended_properties EPA ON EPA.major_id = C.[object_id] AND EPA.minor_id = C.column_id AND EPA.name IN ('SYN_EFAttribute')
 LEFT JOIN sys.extended_properties EPP ON EPP.major_id = C.[object_id] AND EPP.minor_id = C.column_id AND EPP.name IN ('SYN_EFPropertyName')
 LEFT JOIN sys.extended_properties EPD ON EPD.major_id = C.[object_id] AND EPD.minor_id = C.column_id AND EPD.name IN ('MS_Description')
+LEFT JOIN sys.extended_properties EPL ON EPL.major_id = C.[object_id] AND EPL.minor_id = C.column_id AND EPL.name IN ('SYN_EFPropertyLabel')
 WHERE [object_id] = Object_ID('{0}') 
 ORDER BY column_id", tableName);
 			Database db = DatabaseFactory.CreateDatabase();
 			using (IDataReader reader = db.ExecuteReader(CommandType.Text, strCmd))
 			{
-				string propertyName, columnName, attributeValue, descriptionValue, propertyType;
+				string propertyName, columnName, attributeValue, descriptionValue, propertyType, propertyLabel;
 				int maxLength, dbTypeID;
+				bool isNullable;
 				while (reader.Read())
 				{
 					columnName = reader["ColumnName"].ToString();
 					propertyName = reader["PropertyName"].ToString();
 					dbTypeID = int.Parse(reader["DbTypeID"].ToString());
-					propertyType = GetTypeName(dbTypeID, (bool)reader["IsNullable"]);
+					isNullable = (bool)reader["IsNullable"];
+					propertyType = GetTypeName(dbTypeID, isNullable);
+					propertyLabel = reader["PropertyLabel"].ToString();
 					//if (propertyType == "ERROR")
 					//{
 					//	MessageBox.Show(string.Format("Cannot get type name for the type id: {0}", dbTypeID));
@@ -443,7 +447,12 @@ ORDER BY column_id", tableName);
 						}
 					}
 					if (propertyType == "string" && maxLength > 0)
-						WriteLine(sw, indent, string.Format("[StringLength({0}, ErrorMessage=\"the max length is {0}\")]", maxLength));
+						WriteLine(sw, indent, string.Format("[StringLength({0}, ErrorMessage = \"the max length is {0}\")]", maxLength));
+
+					if (!isNullable)
+					{
+						WriteLine(sw, indent, string.Format("[Required(ErrorMessage = \"{0} is required.\")]", string.IsNullOrEmpty(propertyLabel) ? propertyName : propertyLabel));
+					}
 
 					// generate property
 					WriteLine(sw, indent, string.Format("public {0} {1} {{ get; set; }}", propertyType, propertyName));
