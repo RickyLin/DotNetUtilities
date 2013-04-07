@@ -36,6 +36,7 @@ namespace EntityGenerator
 			Task.Factory.StartNew(LoadViews);
 			tbPath.Text = Path.Combine(Environment.CurrentDirectory, "Output");
 			_PluralizationSvc = PluralizationService.CreateService(CultureInfo.GetCultureInfo("en-us"));
+			tbDefaultNamespace.Text = ConfigurationManager.AppSettings["defaultNamespace"];
 		}
 
 		private void LoadViews()
@@ -485,6 +486,10 @@ using System.Data.Entity;";
 		private string GetClassName(string tableName)
 		{
 			string className = tableName;
+			if (char.IsLower(className[0]))
+			{
+				className = string.Format("{0}{1}", char.ToUpper(className[0]), className.Substring(1));
+			}
 			if (className.Contains('_'))
 			{
 				string[] nameParts = className.Split('_');
