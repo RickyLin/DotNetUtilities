@@ -383,18 +383,19 @@ namespace EntityGenerator
 	, EPA.[value] AS AttributeValue, EPD.[value] AS DescriptionValue
 	, Case When EPP.[value] IS NULL Then
 			REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(C.[name],'-','_'), '/','_'),'#','Number'),'.','_'),' ','_')
-		Else EPP.[value] End AS PropertyName, EPL.[value] AS PropertyLabel
+		Else EPP.[value] End AS PropertyName, EPL.[value] AS PropertyLabel, EPDT.[value] AS PropertyDataType
 FROM sys.columns C
 LEFT JOIN sys.extended_properties EPA ON EPA.major_id = C.[object_id] AND EPA.minor_id = C.column_id AND EPA.name IN ('SYN_EFAttribute')
 LEFT JOIN sys.extended_properties EPP ON EPP.major_id = C.[object_id] AND EPP.minor_id = C.column_id AND EPP.name IN ('SYN_EFPropertyName')
 LEFT JOIN sys.extended_properties EPD ON EPD.major_id = C.[object_id] AND EPD.minor_id = C.column_id AND EPD.name IN ('MS_Description')
 LEFT JOIN sys.extended_properties EPL ON EPL.major_id = C.[object_id] AND EPL.minor_id = C.column_id AND EPL.name IN ('SYN_EFPropertyLabel')
+LEFT JOIN sys.extended_properties EPDT ON EPDT.major_id = C.[object_id] AND EPDT.minor_id = C.column_id AND EPDT.name IN ('SYN_EFPropertyDataType')
 WHERE [object_id] = Object_ID('{0}') 
 ORDER BY column_id", tableName);
 			Database db = DatabaseFactory.CreateDatabase();
 			using (IDataReader reader = db.ExecuteReader(CommandType.Text, strCmd))
 			{
-				string propertyName, columnName, attributeValue, descriptionValue, propertyType, propertyLabel;
+				string propertyName, columnName, attributeValue, descriptionValue, propertyType, propertyLabel, propertyDataType;
 				int maxLength, dbTypeID;
 				bool isNullable;
 				while (reader.Read())
@@ -405,6 +406,7 @@ ORDER BY column_id", tableName);
 					isNullable = (bool)reader["IsNullable"];
 					propertyType = GetTypeName(dbTypeID, isNullable);
 					propertyLabel = reader["PropertyLabel"].ToString();
+					propertyDataType = reader["PropertyDataType"].ToString();
 					//if (propertyType == "ERROR")
 					//{
 					//	MessageBox.Show(string.Format("Cannot get type name for the type id: {0}", dbTypeID));
@@ -448,11 +450,21 @@ ORDER BY column_id", tableName);
 						}
 					}
 					if (propertyType == "string" && maxLength > 0)
-						WriteLine(sw, indent, string.Format("[StringLength({0}, ErrorMessage = \"the max length is {0}\")]", maxLength));
+						WriteLine(sw, indent, string.Format("[StringLength({0})]", maxLength));
 
 					if (!isNullable)
 					{
-						WriteLine(sw, indent, string.Format("[Required(ErrorMessage = \"{0} is required.\")]", string.IsNullOrEmpty(propertyLabel) ? propertyName : propertyLabel));
+						WriteLine(sw, indent, "[Required]");
+					}
+
+					if (!string.IsNullOrEmpty(propertyLabel))
+					{
+						WriteLine(sw, indent, string.Format("[Display(Name = \"{0}\")]", propertyLabel));
+					}
+
+					if (!string.IsNullOrEmpty(propertyDataType))
+					{
+						WriteLine(sw, indent, string.Format("[DataType(DataType.{0})]", propertyDataType));
 					}
 
 					// generate property
