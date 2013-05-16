@@ -416,7 +416,7 @@ ORDER BY column_id", tableName);
 					if (string.Compare(propertyName, className + "ID", true) == 0)
 					{
 						WriteLine(sw, indent, string.Format("[Column(\"{0}\")]", columnName));
-						propertyName = "ID";
+						propertyName = "Id";
 					}
 					else if (propertyName == className)
 						propertyName += "Content";
