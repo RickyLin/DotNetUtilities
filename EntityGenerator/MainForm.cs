@@ -452,6 +452,12 @@ ORDER BY column_id", tableName);
 					if (propertyType == "string" && maxLength > 0)
 						WriteLine(sw, indent, string.Format("[StringLength({0})]", maxLength));
 
+					if (propertyType.StartsWith("DateTime"))
+					{
+						WriteLine(sw, indent, "[DataType(DataType.Date)]");
+						WriteLine(sw, indent, "[DisplayFormat(DataFormatString = \"{0:d}\", ApplyFormatInEditMode = true)]");
+					}
+
 					if (!isNullable)
 					{
 						WriteLine(sw, indent, "[Required]");
