@@ -5,6 +5,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityGenerator", "EntityGe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCNetPlugins", "CCNetPlugins\CCNetPlugins.csproj", "{C2089183-D42A-428F-9579-BBBB97FE3069}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UploadToShareFile", "UploadToShareFile\UploadToShareFile.csproj", "{28908332-8957-4238-9B75-6F3E5DEB20E3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F1AC2DB1-3743-4879-BCAA-1025FB081BB7}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +28,10 @@ Global
 		{C2089183-D42A-428F-9579-BBBB97FE3069}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2089183-D42A-428F-9579-BBBB97FE3069}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2089183-D42A-428F-9579-BBBB97FE3069}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28908332-8957-4238-9B75-6F3E5DEB20E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28908332-8957-4238-9B75-6F3E5DEB20E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28908332-8957-4238-9B75-6F3E5DEB20E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28908332-8957-4238-9B75-6F3E5DEB20E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
