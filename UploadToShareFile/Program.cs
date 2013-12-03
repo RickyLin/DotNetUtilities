@@ -1,5 +1,4 @@
-﻿using Ionic.Zip;
-using ShareFileSampleCode;
+﻿using ShareFileSampleCode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
 using System.IO;
+using System.Diagnostics;
 
 namespace UploadToShareFile
 {
@@ -74,28 +74,26 @@ namespace UploadToShareFile
 				return;
 			}
 
-			// create the zip file
+			// create the zip file, using 7-zip to create archive
 			string zipFileName = string.Format("{0}_{1}.zip", fileNamePrefix, File.ReadAllText(versionFilePath));
 			string zipFilePathName = Path.Combine(zipFilePath, zipFileName);
 			Console.WriteLine("Create file: {0}", zipFilePathName);
-			using (ZipFile zip = new ZipFile())
+
+			Process zipProcess = new Process();
+			string cmdParam = string.Format("a {0}", zipFilePathName);
+			foreach (string srcDir in srcDirPaths)
 			{
-				zip.CompressionLevel = Ionic.Zlib.CompressionLevel.BestCompression;
-				zip.Comment = "Ziped by UploadToShareFile App";
-				foreach (string srcDir in srcDirPaths)
-				{
-					zip.AddDirectory(srcDir, Path.GetFileName(srcDir)); // treat the last dir name as file name, so we won't get the parent dir path.
-				}
-				try
-				{
-					zip.Save(zipFilePathName); // will overwrite the existing file.
-				}
-				catch (Exception err)
-				{
-					Console.WriteLine("Failed to zip. {0}", err.Message);
-					Environment.ExitCode = -1;
-					return;
-				}
+				cmdParam = cmdParam + " " + srcDir;
+			}
+
+			zipProcess.StartInfo = new ProcessStartInfo(@"C:\Program Files\7-Zip\7z.exe", cmdParam);
+			zipProcess.Start();
+			zipProcess.WaitForExit();
+
+			if (zipProcess.ExitCode != 0)
+			{
+				Environment.ExitCode = zipProcess.ExitCode;
+				return;
 			}
 
 			// upload the zip file to ShareFile
