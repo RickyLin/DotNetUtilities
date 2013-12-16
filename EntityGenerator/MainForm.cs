@@ -415,8 +415,9 @@ ORDER BY column_id", tableName);
 					maxLength = int.Parse(reader["MaxLength"].ToString());
 					if (string.Compare(propertyName, className + "ID", true) == 0)
 					{
-						WriteLine(sw, indent, string.Format("[Column(\"{0}\")]", columnName));
-						propertyName = "Id";
+						//WriteLine(sw, indent, string.Format("[Column(\"{0}\")]", columnName));
+						//propertyName = "Id";
+						WriteLine(sw, indent, "[Key]");
 					}
 					else if (propertyName == className)
 						propertyName += "Content";
