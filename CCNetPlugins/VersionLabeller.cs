@@ -19,6 +19,9 @@ namespace CCNetPlugins
 		[ReflectorProperty("minor")]
 		public string Minor { get; set; }
 
+		[ReflectorProperty("startDate")]
+		public DateTime StartDate { get; set; }
+
 		public string Generate(IIntegrationResult integrationResult)
 		{
 			// generate the version string
@@ -26,9 +29,9 @@ namespace CCNetPlugins
 			version[0] = Major;
 			version[1] = Minor;
 			TimeSpan days, seconds;
-			DateTime beginDate = new DateTime(2000, 1, 1);
+			DateTime beginDate = StartDate;
 			days = DateTime.Today - beginDate;
-			seconds = DateTime.Now - DateTime.Today.AddHours(-12);
+			seconds = DateTime.Now - DateTime.Today;
 			version[2] = days.Days.ToString();	// Build
 			version[3] = Convert.ToString(Convert.ToInt32(seconds.TotalMinutes));	// Revision
 
